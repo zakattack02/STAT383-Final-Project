@@ -21,4 +21,4 @@ To run the analysis:
 3. Ensure the necessary R packages are installed.
 
 ## License
-This project is licensed under the [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/) license, allowing you to copy, modify, and distribute the work, even for commercial purposes, without asking permission.
+This project is licensed under the [ ]( ) license, allowing you to copy, modify, and distribute the work, even for commercial purposes, without asking permission.
