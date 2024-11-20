@@ -22,4 +22,4 @@ To run the analysis:
 3. Ensure the necessary R packages are installed.
 
 ## License
-This project is licensed under the [ ]( ) license, allowing you to copy, modify, and distribute the work, even for commercial purposes, without asking permission.
+This project is licensed under the [MIT License](LICENSE), allowing you to copy, modify, and distribute the work, even for commercial purposes, without asking permission.

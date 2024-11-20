@@ -55,7 +55,7 @@ print(sum(df_males$vote=="Kamala Harris")/nrow(df_males))
 # proportion of Kamala Harris voters amongst Female students
 print("Female Kamala Harris Votes:")
 print(sum(df_females$vote=="Kamala Harris")/nrow(df_females))
-
+cat('-----------------------------------',"\n")
 
 # Z Test
 # H0: Proportion of voters who support Trump = 0.50
@@ -73,8 +73,20 @@ z_score <- (sample_proportion - p0) / se
 # Calculate p-value
 p_value <- 2 * (1 - pnorm(abs(z_score)))
 # Print results
-cat("Z-score:", z_score, "\n")
-cat("P-value:", p_value, "\n")
+print("Z Testing")
+print(paste("Z-score:", z_score))
+print(paste("P-value:", p_value))
+cat('-----------------------------------',"\n")
+
+# Normality Test -> Chi-Square Goodness-of-Fit Test
+observed_votes <- table(df$vote)
+expected_votes <- rep(sum(observed_votes) / length(observed_votes), length(observed_votes))
+chisq_test <- chisq.test(observed_votes, p = expected_votes / sum(expected_votes))
+print(chisq_test)
+
+#Equal Variances Test
+
+#Independence -> Chi-Square Test
 
 
 
