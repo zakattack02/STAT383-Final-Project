@@ -11,6 +11,7 @@ The dataset used for this project was collected from [insert data source]. It is
 
 ## Results
 
+
 ## Code
 All R code used for data analysis and modeling is included in the repository.
 
@@ -21,4 +22,5 @@ To run the analysis:
 3. Ensure the necessary R packages are installed.
 
 ## License
-This project is licensed under the [ ]( ) license, allowing you to copy, modify, and distribute the work, even for commercial purposes, without asking permission.
+This project is licensed under the [MIT License](LICENSE), allowing you to copy, modify, and distribute the work, even for commercial purposes, without asking permission.
+
