@@ -1,7 +1,7 @@
 graphics.off() # clear all previous plots
-rm(list=ls()) # clear the environment from previous codes
+rm(list=ls()) # clear the environment
 cat("\014") # clear the console 
-# Install Packages if not already installed
+#Install Packages if not already installed
 if (!require(devtools)) install.packages("devtools")
 if (!require(ggpubr)) devtools::install_github("kassambara/ggpubr")
 if (!require(ggplot2)) install.packages("ggplot2")
@@ -23,40 +23,40 @@ head(df)
 trump_mean <- mean(df$vote=="Donald Trump")
 
 
-# change a column name
+#change a column name
 colnames(df)[3] <- "different"
 sum(df$vote=="Donald Trump")
 sum(df$vote=="Kamala Harris")
 sum(df$vote=="Other")
 nrow(df)
 
-# proportion of Donald Trump voters
+#proportion of Donald Trump voters
 print("Donald Trump Votes:")
 print(sum(df$vote=="Donald Trump")/nrow(df))
 
-# proportion of Kamala Harris voters
+#proportion of Kamala Harris voters
 print("Kamala Harris Votes:")
 print(sum(df$vote=="Kamala Harris")/nrow(df))
 
-# proportion of Other voters
+#proportion of Other voters
 print("Other Votes:")
 print(sum(df$vote=="Other")/nrow(df))
 
-# Subsetting a dataset
+#Subsetting a dataset
 
 df_males <- df[df$gender==1,]
 df_females <- df[df$gender==0,]
 
-# proportion of Donald Trump voters amongst male students
+#proportion of Donald Trump voters amongst male students
 print("Male Donald Trump Votes:")
 print(sum(df_males$vote=="Donald Trump")/nrow(df_males))
-# proportion of Donald Trump voters amongst female students
+#proportion of Donald Trump voters amongst female students
 print("Female Donald Trump Votes:")
 print(sum(df_females$vote=="Donald Trump")/nrow(df_females))
 
 
 
-# proportion of Kamala Harris voters amongst Male students
+#proportion of Kamala Harris voters amongst Male students
 print("Male Kamala Harris Votes:")
 print(sum(df_males$vote=="Kamala Harris")/nrow(df_males))
 # proportion of Kamala Harris voters amongst Female students
@@ -65,26 +65,26 @@ print(sum(df_females$vote=="Kamala Harris")/nrow(df_females))
 print('-----------------------------------')
 
 
-# Z Test
+#Z Test
 # H0: Proportion of voters who support Trump = 0.50
 # Ha: Proportion of voters who support Trump != 0.50
 
-# Sample proportion
+#Sample proportion
 sample_proportion <- sum(df$vote == "Donald Trump") / nrow(df)
 p0 <- 0.50  # Null hypothesis proportion
 n <- nrow(df)
 
-# Standard error and Z-score
+#Standard error and Z-score
 se <- sqrt(p0 * (1 - p0) / n)
 z_score <- (sample_proportion - p0) / se
 
-# P-value (two-tailed test)
+#P-value (two-tailed test)
 p_value <- 2 * (1 - pnorm(abs(z_score)))
 
-# Create the plot for Z-Test
+#Create the plot for Z-Test
 library(ggplot2)
 
-# Generate a sequence of values for the normal distribution
+#Generate a sequence of values for the normal distribution
 x <- seq(-4, 4, length = 1000)
 y <- dnorm(x)
 
@@ -110,31 +110,31 @@ ggplot(data.frame(x, y), aes(x, y)) +
 
 #LINEAR REGRESSION
 print("LINEAR REGRESSION")
-# Convert 'vote' to numeric: Kamala Harris = 0, Donald Trump = 1, Other = 2
+#Convert 'vote' to numeric: Kamala Harris = 0, Donald Trump = 1, Other = 2
   df$vote_numeric <- ifelse(df$vote == "Kamala Harris", 0, 
                             ifelse(df$vote == "Donald Trump", 1, 2))
   colnames(df)
   colnames(df)[colnames(df) == "incorrect_column_name"] <- "vote_different_than_at_least_one_of_your_parent"
   
-# Check the new 'vote_numeric' column
+#Check the new 'vote_numeric' column
   head(df)
   
-# Predict vote outcome based on gender, vote_diff, and minority status
+#Predict vote outcome based on gender, vote_diff, and minority status
   model <- lm(vote_numeric ~ gender + different + minority, data = df)
   
-# View the summary of the regression model
+#View summary of the regression model
   summary(model)
   
-# Predict the vote outcome based on the model
+#Predict outcome based on the model
   df$predicted_vote <- predict(model)
   
-# Display the first few predicted values
+#Display first few predicted values
   head(df$predicted_vote)
   
 #Visualizing the predicted vote by gender with a scatterplot and best fit line
   ggplot(df, aes(x = factor(gender), y = predicted_vote)) +
     geom_point(aes(color = factor(gender)), size = 3) +  # Add points for predicted votes by gender
-    geom_smooth(method = "lm", aes(group = 1), se = FALSE, color = "black", linetype = "dashed") +  # Best fit line
+    geom_smooth(method = "lm", aes(group = 1), se = FALSE, color = "black", linetype = "dashed") +  #Best fit line
     labs(title = "Predicted Vote by Gender with Best Fit Line",
          x = "Gender",
          y = "Predicted Vote") +
@@ -146,33 +146,33 @@ print("LINEAR REGRESSION")
   
 #Create a plot for Parental Influence vs Predicted Vote with Legend Labels
   ggplot(df, aes(x = different, y = predicted_vote)) +
-    geom_point(aes(color = factor(different)), size = 3) +  # Add points for each parental influence
-    geom_smooth(method = "lm", aes(group = 1), se = FALSE, color = "black", linetype = "dashed") +  # Best fit line
+    geom_point(aes(color = factor(different)), size = 3) +  #Add points for each parental influence
+    geom_smooth(method = "lm", aes(group = 1), se = FALSE, color = "black", linetype = "dashed") +  #Best fit line
     labs(title = "Predicted Vote by Parental Influence with Best Fit Line",
          x = "Parental Influence (Vote Difference)",
          y = "Predicted Vote") +
     scale_color_manual(values = c("0" = "blue", "1" = "pink", "2" = "green"), 
                        name = "Parental Influence", 
-                       labels = c("No Influence", "Minor Influence", "Major Influence")) +  # Customize the legend
+                       labels = c("No Influence", "Minor Influence", "Major Influence")) + 
     theme_minimal() +
-    theme(legend.title = element_text(size = 12, face = "bold"),  # Customize legend title
-          legend.text = element_text(size = 10))  # Customize legend text
+    theme(legend.title = element_text(size = 12, face = "bold"),  
+          legend.text = element_text(size = 10))  
   
 
   
 #Create a plot for Minority Status vs Predicted Vote with a Line Plot
   ggplot(df, aes(x = factor(minority), y = predicted_vote)) +
-    geom_point(aes(color = factor(minority)), size = 3) +  # Add points for each minority status
-    geom_smooth(method = "lm", aes(group = 1), se = FALSE, color = "black", linetype = "dashed") +  # Best fit line
+    geom_point(aes(color = factor(minority)), size = 3) +  #Add points for each minority status
+    geom_smooth(method = "lm", aes(group = 1), se = FALSE, color = "black", linetype = "dashed") +  #Best fit line
     labs(title = "Predicted Vote by Minority Status with Best Fit Line",
          x = "Minority Status",
          y = "Predicted Vote") +
-    scale_color_manual(values = c("0" = "blue", "1" = "pink"),  # Color scale for Minority Status
+    scale_color_manual(values = c("0" = "blue", "1" = "pink"), 
                        name = "Minority Status",
-                       labels = c("Non-Minority", "Minority")) +  # Custom labels for the legend
+                       labels = c("Non-Minority", "Minority")) + 
     theme_minimal() +
-    theme(legend.title = element_text(size = 12, face = "bold"),  # Customize legend title
-          legend.text = element_text(size = 10))  # Customize legend text
+    theme(legend.title = element_text(size = 12, face = "bold"), 
+          legend.text = element_text(size = 10))  
   
   
 
@@ -192,10 +192,11 @@ print("LINEAR REGRESSION")
   scale_fill_manual(values = c("blue", "red", "green"), 
                     labels = c("Kamala Harris", "Donald Trump", "Other")) +
   theme_minimal() +
-  theme(legend.title = element_blank())  # Remove legend title for cleaner look
+  theme(legend.title = element_blank())  
+  # Remove legend title for cleaner look
 
   
-# Calculate mean and SD
+#Calculate mean and SD
   mean_votes <- mean(df$vote == "Donald Trump")
   sd_votes <- sqrt(mean(1 - mean_votes))
 
@@ -206,22 +207,22 @@ print("LINEAR REGRESSION")
   df$vote_numeric <- ifelse(df$vote == "Kamala Harris", 0, 
                           ifelse(df$vote == "Donald Trump", 1, 2))
 
-# vote_numeric is the dependent variable and gender is the grouping variable
+#vote_numeric is the dependent variable and gender is the grouping variable
   leveneTest(vote_numeric ~ factor(vote), data = df)
 
-# Levene's Test for gender-based vote variance
+#Levene's Test for gender-based vote variance
   leveneTest(vote_numeric ~ factor(gender), data = df)
 
-# Levene's Test for parental vote difference-based variance
+#Levene's Test for parental vote difference-based variance
   leveneTest(vote_numeric ~ factor(different), data = df)
 
-# Levene's Test for minority-based vote variance
+#Levene's Test for minority-based vote variance
   leveneTest(vote_numeric ~ factor(minority), data = df)
 
-# Boxplot with jitter added
+#Boxplot with jitter added
   ggplot(df, aes(x = factor(vote), y = vote_numeric, fill = factor(vote))) +
   geom_boxplot() +
-  geom_jitter(width = 0.2, alpha = 0.5) +  # Add jitter to show individual data points
+  geom_jitter(width = 0.2, alpha = 0.5) +  #Added jitter to show individual data points
   labs(title = "Vote Variance Across Categories", 
        x = "Vote Category", 
        y = "Vote Numeric (0 = Kamala, 1 = Trump, 2 = Other)") +
@@ -229,7 +230,7 @@ print("LINEAR REGRESSION")
                     labels = c("Kamala Harris", "Donald Trump", "Other")) +
   theme_minimal()
 
-# Boxplot for gender-based vote variance
+#Boxplot for gender-based vote variance
   ggplot(df, aes(x = factor(gender), y = vote_numeric, fill = factor(gender))) +
   geom_boxplot() +
   labs(title = "Vote Variance Based on Gender", 
@@ -238,7 +239,7 @@ print("LINEAR REGRESSION")
   scale_fill_manual(values = c("lightblue", "pink","plum4"), labels = c("Male", "Female")) +
   theme_minimal()
 
-# Boxplot for minority-based vote variance
+#Boxplot for minority-based vote variance
   ggplot(df, aes(x = factor(minority), y = vote_numeric, fill = factor(minority))) +
   geom_boxplot() +
   labs(title = "Vote Variance Based on Minority Status", 
@@ -247,7 +248,7 @@ print("LINEAR REGRESSION")
   scale_fill_manual(values = c("lightgreen", "orange","deeppink3"), labels = c("Not Minority", "Minority")) +
   theme_minimal()
 
-# Boxplot for parental vote difference-based variance
+#Boxplot for parental vote difference-based variance
   ggplot(df, aes(x = factor(different), y = vote_numeric, fill = factor(different))) +
   geom_boxplot() +
   labs(title = "Vote Variance Based on Parental Vote Difference", 
@@ -257,14 +258,13 @@ print("LINEAR REGRESSION")
   theme_minimal()
 
 
-
 #Normality Test   
   print("Normality Test")
   # Shapiro-Wilk Test for normality
   shapiro_test <- shapiro.test(df$vote_numeric)
   print(shapiro_test)
   
-  # Add small random noise to vote_numeric to break ties
+#Add small random noise to vote_numeric to break ties
   df$vote_numeric_no_ties <- df$vote_numeric + rnorm(length(df$vote_numeric), 0, 1e-6)
   
   # Kolmogorov-Smirnov Test with noise
@@ -272,7 +272,7 @@ print("LINEAR REGRESSION")
   
   print(ks_test)
   
-  # Histogram for normality
+#Histogram for normality
   ggplot(df, aes(x = vote_numeric)) +
     geom_histogram(binwidth = 0.1, fill = "blue", alpha = 0.7) +
     labs(title = "Histogram of Vote Numeric", x = "Vote Numeric", y = "Frequency") +
