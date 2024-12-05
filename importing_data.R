@@ -3,7 +3,6 @@ rm(list=ls()) # clear the environment from previous codes
 cat("\014") # clear the console 
 # Install Packages if not already installed
 if (!require(devtools)) install.packages("devtools")
-library(devtools)
 if (!require(ggpubr)) devtools::install_github("kassambara/ggpubr")
 if (!require(ggplot2)) install.packages("ggplot2")
 if (!require(tidyverse)) install.packages("tidyverse")
@@ -12,7 +11,7 @@ library(ggplot2)
 library(tidyverse)
 library(ggpubr)
 library(car)
-
+library(devtools)
 
 
 library(readxl)
@@ -63,70 +62,121 @@ print(sum(df_males$vote=="Kamala Harris")/nrow(df_males))
 # proportion of Kamala Harris voters amongst Female students
 print("Female Kamala Harris Votes:")
 print(sum(df_females$vote=="Kamala Harris")/nrow(df_females))
-cat('-----------------------------------',"\n")
+print('-----------------------------------')
+
 
 # Z Test
 # H0: Proportion of voters who support Trump = 0.50
 # Ha: Proportion of voters who support Trump != 0.50
 
-# Calculate sample proportion
-  sample_proportion <- sum(df$vote == "Donald Trump") / nrow(df)
-  p0 <- 0.50
-  n <- nrow(df)
+# Sample proportion
+sample_proportion <- sum(df$vote == "Donald Trump") / nrow(df)
+p0 <- 0.50  # Null hypothesis proportion
+n <- nrow(df)
 
-# Calculate standard error
-  se <- sqrt(p0 * (1 - p0) / n)
-# Calculate z-score
-  z_score <- (sample_proportion - p0) / se
-# Calculate p-value
-  p_value <- 2 * (1 - pnorm(abs(z_score)))
-# Print results
-  print("Z Testing")
-  print(paste("Z-score:", z_score))
-  print(paste("P-value:", p_value))
-  cat('-----------------------------------',"\n")
-# Sample T Test
-  x_sample <- df$vote[df$vote == "Donald Trump"]
-  y_sample <- df$vote[df$vote == "Other"]
+# Standard error and Z-score
+se <- sqrt(p0 * (1 - p0) / n)
+z_score <- (sample_proportion - p0) / se
 
-# Convert votes to numeric for t-test
-  x_sample_numeric <- as.numeric(x_sample == "Donald Trump")
-  y_sample_numeric <- as.numeric(y_sample == "Other")
+# P-value (two-tailed test)
+p_value <- 2 * (1 - pnorm(abs(z_score)))
 
-# Perform two-sample t-test 
-#sample_t_test <- t.test(x_sample_numeric, y_sample_numeric, alternative = "two.sided")
-#sample_t_test <- t.test(x_sample_numeric,mean= trump_mean, alternative = "two.sided")
-print(sample_t_test)
-#cat('-----------------------------------',"\n")
+# Create the plot for Z-Test
+library(ggplot2)
+
+# Generate a sequence of values for the normal distribution
+x <- seq(-4, 4, length = 1000)
+y <- dnorm(x)
+
+print("Z-Test Results:")
+print(paste("Sample Proportion of Trump Voters:", round(sample_proportion, 4)))
+print(paste("Z-score:", round(z_score, 4)))
+print(paste("P-value:", round(p_value, 4)))
+print('-----------------------------------')
+# Create the plot
+ggplot(data.frame(x, y), aes(x, y)) +
+  geom_line(color = "blue", size = 1) +  # Normal distribution curve
+  geom_vline(xintercept = z_score, color = "red", linetype = "dashed", size = 1) +  # Z-score line
+  geom_area(data = data.frame(x = x[x <= -abs(z_score)]), aes(x = x, y = dnorm(x)), fill = "red", alpha = 0.3) +  # Left tail area (p-value)
+  geom_area(data = data.frame(x = x[x >= abs(z_score)]), aes(x = x, y = dnorm(x)), fill = "red", alpha = 0.3) +  # Right tail area (p-value)
+  labs(title = "Z-Test Visualization",
+       subtitle = paste("Z-score = ", round(z_score, 2), " | P-value = ", round(p_value, 4)),
+       x = "Z-value",
+       y = "Density") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5))
+
 
 
 #LINEAR REGRESSION
-# Create a numeric version of the 'vote' column
+# Convert 'vote' to numeric: Kamala Harris = 0, Donald Trump = 1, Other = 2
   df$vote_numeric <- ifelse(df$vote == "Kamala Harris", 0, 
-                          ifelse(df$vote == "Donald Trump", 1, 2))
-
-# Check the new column
+                            ifelse(df$vote == "Donald Trump", 1, 2))
+  colnames(df)
+  colnames(df)[colnames(df) == "incorrect_column_name"] <- "vote_different_than_at_least_one_of_your_parent"
+  
+# Check the new 'vote_numeric' column
   head(df)
-# Linear regression model to predict vote outcome based on gender, vote difference from parents, and minority status
+  
+# Predict vote outcome based on gender, vote_diff, and minority status
   model <- lm(vote_numeric ~ gender + different + minority, data = df)
-
+  
 # View the summary of the regression model
   summary(model)
-
-# Predicting the vote outcome based on the model
+  
+# Predict the vote outcome based on the model
   df$predicted_vote <- predict(model)
+  
+# Display the first few predicted values
+  head(df$predicted_vote)
+  
+#Visualizing the predicted vote by gender with a scatterplot and best fit line
+  ggplot(df, aes(x = factor(gender), y = predicted_vote)) +
+    geom_point(aes(color = factor(gender)), size = 3) +  # Add points for predicted votes by gender
+    geom_smooth(method = "lm", aes(group = 1), se = FALSE, color = "black", linetype = "dashed") +  # Best fit line
+    labs(title = "Predicted Vote by Gender with Best Fit Line",
+         x = "Gender",
+         y = "Predicted Vote") +
+    scale_color_manual(values = c("blue", "pink", "green"), 
+                       labels = c("Female", "Male", "Other")) +
+    theme_minimal() +
+    theme(legend.title = element_blank())
 
-# Plot the predicted values against actual values
-  ggplot(df, aes(x = predicted_vote, y = vote_numeric)) +
-  geom_point(aes(color = factor(vote_numeric)), alpha = 0.5) +
-  geom_smooth(method = "lm", se = FALSE, color = "blue") +
-  labs(title = "Linear Regression of Vote on Gender, Parental Influence, and Minority Status",
-       x = "Predicted Vote",
-       y = "Actual Vote") +
-  scale_color_manual(values = c("red", "green", "blue"), labels = c("Kamala Harris", "Donald Trump", "Other")) +
-  theme_minimal()
+  
+#Create a plot for Parental Influence vs Predicted Vote with Legend Labels
+  ggplot(df, aes(x = different, y = predicted_vote)) +
+    geom_point(aes(color = factor(different)), size = 3) +  # Add points for each parental influence
+    geom_smooth(method = "lm", aes(group = 1), se = FALSE, color = "black", linetype = "dashed") +  # Best fit line
+    labs(title = "Predicted Vote by Parental Influence with Best Fit Line",
+         x = "Parental Influence (Vote Difference)",
+         y = "Predicted Vote") +
+    scale_color_manual(values = c("0" = "blue", "1" = "pink", "2" = "green"), 
+                       name = "Parental Influence", 
+                       labels = c("No Influence", "Minor Influence", "Major Influence")) +  # Customize the legend
+    theme_minimal() +
+    theme(legend.title = element_text(size = 12, face = "bold"),  # Customize legend title
+          legend.text = element_text(size = 10))  # Customize legend text
+  
 
-# Independence -> Chi-Square Goodness-of-Fit Test
+  
+#Create a plot for Minority Status vs Predicted Vote with a Line Plot
+  ggplot(df, aes(x = factor(minority), y = predicted_vote)) +
+    geom_point(aes(color = factor(minority)), size = 3) +  # Add points for each minority status
+    geom_smooth(method = "lm", aes(group = 1), se = FALSE, color = "black", linetype = "dashed") +  # Best fit line
+    labs(title = "Predicted Vote by Minority Status with Best Fit Line",
+         x = "Minority Status",
+         y = "Predicted Vote") +
+    scale_color_manual(values = c("0" = "blue", "1" = "pink"),  # Color scale for Minority Status
+                       name = "Minority Status",
+                       labels = c("Non-Minority", "Minority")) +  # Custom labels for the legend
+    theme_minimal() +
+    theme(legend.title = element_text(size = 12, face = "bold"),  # Customize legend title
+          legend.text = element_text(size = 10))  # Customize legend text
+  
+  
+
+
+#Independence -> Chi-Square Goodness-of-Fit Test
   observed_votes <- table(df$vote)
   expected_votes <- rep(sum(observed_votes) / length(observed_votes), length(observed_votes))
   chisq_test <- chisq.test(observed_votes, p = expected_votes / sum(expected_votes))
@@ -142,8 +192,6 @@ print(sample_t_test)
                     labels = c("Kamala Harris", "Donald Trump", "Other")) +
   theme_minimal() +
   theme(legend.title = element_blank())  # Remove legend title for cleaner look
-  
-  
 
   
 # Calculate mean and SD
@@ -228,5 +276,7 @@ print(sample_t_test)
     theme_minimal()
   
   
-
+#CALCULATIONS 
+  
+  
 
