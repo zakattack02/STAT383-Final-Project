@@ -109,6 +109,7 @@ ggplot(data.frame(x, y), aes(x, y)) +
 
 
 #LINEAR REGRESSION
+print("LINEAR REGRESSION")
 # Convert 'vote' to numeric: Kamala Harris = 0, Donald Trump = 1, Other = 2
   df$vote_numeric <- ifelse(df$vote == "Kamala Harris", 0, 
                             ifelse(df$vote == "Donald Trump", 1, 2))
@@ -177,11 +178,11 @@ ggplot(data.frame(x, y), aes(x, y)) +
 
 
 #Independence -> Chi-Square Goodness-of-Fit Test
+  print("Independence")
   observed_votes <- table(df$vote)
   expected_votes <- rep(sum(observed_votes) / length(observed_votes), length(observed_votes))
   chisq_test <- chisq.test(observed_votes, p = expected_votes / sum(expected_votes))
   print(chisq_test)
-#print Graphs 
 # Density plot
   ggplot(df, aes(x = vote_numeric, fill = factor(vote))) +
   geom_density(alpha = 0.6) +  # alpha controls transparency
@@ -201,6 +202,7 @@ ggplot(data.frame(x, y), aes(x, y)) +
   
   
 #Equal Variances Test
+  print("Equal Variances Test")
   df$vote_numeric <- ifelse(df$vote == "Kamala Harris", 0, 
                           ifelse(df$vote == "Donald Trump", 1, 2))
 
@@ -257,6 +259,7 @@ ggplot(data.frame(x, y), aes(x, y)) +
 
 
 #Normality Test   
+  print("Normality Test")
   # Shapiro-Wilk Test for normality
   shapiro_test <- shapiro.test(df$vote_numeric)
   print(shapiro_test)
